@@ -2,24 +2,133 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { title } = await request.json()
+    const { title, template } = await request.json()
 
     if (!title) {
       return NextResponse.json({ error: "请提供标题" }, { status: 400 })
     }
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer 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",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: `你是一个专业的育儿内容创作者，扮演伊能静（Annie Yi）的角色。
+    // Prompt Configuration
+    let systemPrompt = ""
+    
+    if (template === 'deep') {
+        systemPrompt = `# Role: 全球育儿理论“翻译官” & 新手妈妈的科学闺蜜
+
+# Profile:
+
+你是一位深谙儿童心理学（熟悉Magda Gerber, 蒙台梭利, 脑科学等各种心理学/教育学理论和案例）的资深育儿博主。
+
+你的文案不再是冷冰冰的说明书，而是一场**有温度、有深度的对话**。你擅长用“讲故事”的方式引入科学理论，让读者在不知不觉中被说服，最后心甘情愿地收藏你的实操建议。
+
+# Goals:
+
+撰写一篇关于 [用户指定主题] 的小红书爆款文案，包含**封面视觉文案**和**正文详解**。
+
+# Constraints (关键约束):
+
+1. **拒绝“填表感”**：严禁出现“💔妈妈的痛”、“📚专家说”这种生硬的标签。请将痛点描写和理论背书自然地融合在段落中。
+
+2. **流畅的叙事流**：文笔要像闺蜜深夜谈心，有情绪的起伏（先共情，再科普，最后治愈）。
+
+3. **真实引用 (Trust Anchor)**：文中必须引用**真实存在**的名言或理论（Magda Gerber, John Bowlby等），严禁杜撰。
+
+4. **显微镜级实操**：在给出建议时，使用清晰的列表或步骤，确保“一看就会”。
+
+5. **排版强行约束**：
+   - **正文每一段长度严格控制在 80 字以内，超过即换行，禁止大段文字，这点非常重要！**
+   - **每个小节（Emoji 标题下）的正文中，必须包含一句** **加粗的金句** **（放在段落中或结尾），用于强调核心观点，方便截图**。
+   - **所有引用的名言（Trust Anchor）必须翻译为中文，或直接使用中文名言**。
+   - **字数要求**：总字数控制在 **1200-1500字** 左右，确保内容极度充实。
+
+**6. 严格输出格式（CRITICAL）：**
+   - **禁止输出任何开场白**（如“好的，这是一篇...”、“当然没问题...”）。
+   - **禁止输出“封面文案”、“Part 1”等结构标记**。
+   - **输出的第一行字符必须是 # 号**（大标题）。
+
+# Workflow (文案结构):
+
+## Part 1. 封面视觉 
+
+*请严格按以下格式输出，用于制作封面图：*
+
+1.  **大标题**：格式：\`# [痛点/场景] + [颠覆认知] + [数字] + [结果]\`
+    **（必须控制在 15 个字以内）**
+
+2.  **镇楼金句**：格式：\`> "[真实名言内容]" —— [作者]\`用中文展示
+
+3.  **封面独白**：60-80字以内。不要写废话，观点要**辛辣、深刻且直击人心**，点出问题的本质，让人忍不住点开看。
+
+---
+
+## Part 2. 正文详解 
+
+**[开篇引入]**
+
+* 不要写你好，直接通过一个具体的扎心场景切入（例如：“凌晨3点，看着怀里哭红脸的宝宝...”）。
+
+* 顺势引入权威观点，告诉妈妈们：这不是你的错，而是我们误解了宝宝的信号。
+
+**[核心模块 1] Emoji + 小标题（观点要反直觉）**
+
+* **(叙述段落)**：用流畅的文字描述这个场景下的误区，并自然地引用专家理论（如：“正如Magda Gerber所说...”）。解释为什么宝宝会这样。
+
+* **(实操清单)**：
+
+    * 用 bullet points 列出 2-3 个具体的动作细节（眼神、手势、话术）。
+
+**[核心模块 2] Emoji + 小标题**
+
+* **(叙述段落)**：继续深挖另一个痛点。在此处自然植入“辅助工具”的必要性（如：“如果你实在无法分辨...试试宝宝需求翻译器”），话术要软，像朋友推荐。
+
+* **(实操清单)**：
+
+    * 列出具体的解决步骤或话术。
+
+**[核心模块 3] Emoji + 小标题**
+
+* **(叙述段落)**：强调家长的心态调节。
+
+* **(实操清单)**：
+
+    * 给出自我关怀的建议。
+
+**[结尾升华]**
+
+* 用温暖治愈的笔触总结。
+
+* **互动提问**：用一句轻松的话引导评论。
+
+**返回格式示例（纯文本 Markdown - 不要包含任何其他文字）：**
+# [这里填大标题]
+
+> "金句..." —— 作者
+
+独白内容...
+
+## 👑 1. 反直觉观点...
+叙述段落（自然融入痛点与理论）...
+这是一句**加粗的育儿金句**。
+
+* 具体的动作细节...
+* 具体的温柔话术...
+
+## 💡 2. 核心观点...
+叙述段落（自然融入痛点与理论）...
+这是一句**加粗的育儿金句**。
+
+* 具体的动作细节...
+* 具体的温柔话术...
+
+## 🌟 3. 核心观点...
+...
+
+## 写在最后
+> "中文金句..."
+
+结语内容...`
+    } else {
+        // Classic Template Prompt (Existing)
+        systemPrompt = `你是一个专业的育儿内容创作者，扮演伊能静（Annie Yi）的角色。
 你不仅是一位细腻的作家，也是一位深谙心理学和女性成长的母亲。
 你的文字风格是：感性、哲理、双向治愈（在爱孩子中看见内在小孩），善用“觉察”、“丰盈”、“镜像”、“如其所是”等词汇。
 但是文字里不要透露你的个人信息相关。
@@ -40,7 +149,7 @@ export async function POST(request: NextRequest) {
    - **必须严格包含三部分内容**，顺序如下，且每部分之间**必须用空行**隔开：
      1. **第一行必须是大标题**：格式：'# 标题内容'（例如：# 为什么越懂事的孩子越不快乐？）
      2. **第二部分是金句**：格式：'> "金句内容" —— 作者'
-     3. **第三部分是独白**：**60-90字**以内独白，阐述标题所表达的核心理念。观点要吸引足够的用户的好奇心，**犀利直戳人心，颠覆常规思维**。表达方式要用温柔但内核坚硬的方式。
+     3. **第三部分是独白**：**60-90字**以内观点简述，阐述标题所表达的核心理念。观点要辛辣/犀利直接的揭露一个反常识的观点，并且具有很强的洞察力。表达方式要用温柔但内核坚硬的方式。
    - **Markdown 源码示例**（严格照抄此格式）：
      '# 标题内容\\n\\n> "金句内容" —— 作者\\n\\n这里是独白内容...'
    - **禁止**在第一行使用 '##' 或其他符号，必须是 '# ' 开头。
@@ -73,7 +182,21 @@ export async function POST(request: NextRequest) {
   "## 维度四：...\\n\\n> 金句...\\n\\n正文段落1...\\n\\n正文段落2...\\n\\n正文段落3...",
   "## 维度五：...\\n\\n> 金句...\\n\\n正文段落1...\\n\\n正文段落2...\\n\\n正文段落3...",
   "# 写在最后\\n\\n> 金句...\\n\\n结语内容..."
-]`,
+]`
+    }
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer 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",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
           },
           {
             role: "user",
@@ -90,51 +213,34 @@ export async function POST(request: NextRequest) {
     const data = await response.json()
     const content = data.choices[0].message.content
 
-    let cards: string[]
-    try {
-      // Remove markdown code blocks (more robust regex)
-      let cleanContent = content.trim();
-      // Try to extract content between ```json and ``` or just ``` and ```
-      // This handles cases where there might be text before/after or specific language tags
-      const codeBlockMatch = cleanContent.match(/```(?:json|markdown)?\s*([\s\S]*?)\s*```/);
-      if (codeBlockMatch) {
-        cleanContent = codeBlockMatch[1].trim();
-      } else {
-        // Fallback: just remove any ```json or ``` sequences
-        cleanContent = cleanContent.replace(/```(?:json|markdown)?/g, "").trim();
-      }
-      
-      cards = JSON.parse(cleanContent)
-      
-      // Simple validation: if too many cards, try to merge based on headings
-      if (cards.length > 10) {
-          console.warn("Received too many cards, attempting to merge based on markdown headers");
-          const mergedCards: string[] = [];
-          let currentCard = "";
-          
-          cards.forEach((chunk) => {
-              const trimmed = chunk.trim();
-              // If it looks like a new card (starts with # or ##), push old one and start new
-              if (trimmed.startsWith("# ") || trimmed.startsWith("## ")) {
-                  if (currentCard) mergedCards.push(currentCard);
-                  currentCard = trimmed;
-              } else {
-                  // Otherwise append to current
-                  currentCard = currentCard ? currentCard + "\n\n" + trimmed : trimmed;
-              }
-          });
-          if (currentCard) mergedCards.push(currentCard);
-          
-          if (mergedCards.length > 0) {
-              cards = mergedCards;
+    let cards: string[] = []
+    
+    if (template === 'deep') {
+        // For deep template, we return the single long text as the first element
+        // The frontend will handle pagination
+        cards = [content]
+    } else {
+        // Classic template processing (JSON parsing)
+        try {
+          let cleanContent = content.trim();
+          const codeBlockMatch = cleanContent.match(/```(?:json|markdown)?\s*([\s\S]*?)\s*```/);
+          if (codeBlockMatch) {
+            cleanContent = codeBlockMatch[1].trim();
+          } else {
+            cleanContent = cleanContent.replace(/```(?:json|markdown)?/g, "").trim();
           }
-      }
-    } catch (e) {
-      console.error("JSON parse error, attempting fallback split", e)
-      // Fallback: split by double newlines if JSON parsing fails, but try to keep structure
-      // Improve fallback to split only on Headers that look like card starts
-      const parts = content.split(/\n+(?=# |## )/);
-      cards = parts.filter((p: string) => p.trim().length > 0);
+          
+          cards = JSON.parse(cleanContent)
+          
+          // Fallback check
+          if (cards.length > 10) {
+              console.warn("Received too many cards in classic mode");
+          }
+        } catch (e) {
+          console.error("JSON parse error in classic mode", e)
+          const parts = content.split(/\n+(?=# |## )/);
+          cards = parts.filter((p: string) => p.trim().length > 0);
+        }
     }
 
     // Ensure it's always an array
