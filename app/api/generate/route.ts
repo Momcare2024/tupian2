@@ -323,8 +323,8 @@ ${workflowContent}
     const data = await response.json()
     let content = data.choices[0].message.content
 
-    // Strip markdown code blocks if present
-    content = content.replace(/^```markdown\n/, '').replace(/^```\n/, '').replace(/\n```$/, '');
+    // Strip markdown code blocks if present (Robust regex for whitespace/newlines)
+    content = content.replace(/^```(markdown)?\s*/i, '').replace(/\s*```$/, '');
 
     // Convert to array for frontend compatibility (even though it's one long string now)
     // Simplify logic to avoid any potential let/const caching issues
