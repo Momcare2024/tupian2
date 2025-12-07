@@ -236,9 +236,11 @@ export default function Home() {
         }),
       })
 
-      if (!response.ok) throw new Error("生成失败")
-
       const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "生成失败")
+      }
 
       // 两个模版都使用自动分页
       const fullContent = data.cards[0];
@@ -252,7 +254,7 @@ export default function Home() {
 
     } catch (error) {
       console.error("Generate error:", error)
-      alert("生成失败，请重试")
+      alert(error instanceof Error ? error.message : "生成失败，请重试")
     } finally {
       setLoading(false)
     }

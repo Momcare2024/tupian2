@@ -328,6 +328,7 @@ ${workflowContent}
     return NextResponse.json({ cards: [content] })
   } catch (error) {
     console.error("Generate error:", error)
-    return NextResponse.json({ error: "生成失败，请重试" }, { status: 500 })
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
