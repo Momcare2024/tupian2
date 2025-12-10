@@ -6,11 +6,13 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { CardPreview } from "@/components/card-preview"
 import { DeepReadingCard } from "@/components/deep-reading-card"
-import { Loader2, Download, LayoutTemplate, BookOpen, UserCircle } from "lucide-react"
+import { Loader2, Download, LayoutTemplate, BookOpen, UserCircle, PenTool, Sparkles } from "lucide-react"
 import { toPng } from "html-to-image"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function Home() {
+  const [mode, setMode] = useState<'ai' | 'custom'>('ai')
+  const [customContent, setCustomContent] = useState("")
   const [title, setTitle] = useState("")
   const [template, setTemplate] = useState<'classic' | 'deep'>('classic')
   const [persona, setPersona] = useState('parenting')
@@ -23,23 +25,28 @@ export default function Home() {
 
   // Helper: Render a single line to HTML string (simplified Markdown support)
   const renderLineToHtml = (line: string, isFirstPage: boolean) => {
+    const trimmedLine = line.trim();
+
     if (template === 'classic') {
       // Classic Template Styles (Match CardPreview)
-      if (line.startsWith("# ")) {
-        return `<h1 class="text-[24px] leading-snug font-bold text-[#111827] mb-3 tracking-tight ${isFirstPage ? "text-center px-2" : "text-left"}">${line.slice(2)}</h1>`
+      if (/^##\s*/.test(trimmedLine)) {
+        const content = trimmedLine.replace(/^##\s*/, '');
+        return `<h2 class="text-[20px] font-bold text-[#111827] mb-2 tracking-tight border-l-4 border-[#111827] pl-3">${content}</h2>`
       }
-      if (line.startsWith("## ")) {
-        return `<h2 class="text-[20px] font-bold text-[#111827] mb-2 tracking-tight border-l-4 border-[#111827] pl-3">${line.slice(3)}</h2>`
+      if (/^#\s*/.test(trimmedLine) && !/^##\s*/.test(trimmedLine)) {
+        const content = trimmedLine.replace(/^#\s*/, '');
+        return `<h1 class="text-[24px] leading-snug font-bold text-[#111827] mb-3 tracking-tight ${isFirstPage ? "text-center px-2" : "text-left"}">${content}</h1>`
       }
-      if (line.startsWith("> ")) {
+      if (/^>\s*/.test(trimmedLine)) {
+        const content = trimmedLine.replace(/^>\s*/, '');
         if (isFirstPage) {
-          return `<div class="mb-4 flex gap-4 justify-center border-y border-gray-100 py-3 mx-2"><blockquote class="text-[14px] text-[#4b5563] leading-6 italic text-center px-2">${line.slice(2)}</blockquote></div>`
+          return `<div class="mb-4 flex gap-4 justify-center border-y border-gray-100 py-3 mx-2"><blockquote class="text-[14px] text-[#4b5563] leading-6 italic text-center px-2">${content}</blockquote></div>`
         } else {
-          return `<div class="mb-4 flex gap-4 justify-center py-1"><blockquote class="text-[13px] text-gray-600 font-medium bg-gray-50 rounded-lg w-full mx-0 px-4 py-2 text-left border border-gray-100">${line.slice(2)}</blockquote></div>`
+          return `<div class="mb-4 flex gap-4 justify-center py-1"><blockquote class="text-[13px] text-gray-600 font-medium bg-gray-50 rounded-lg w-full mx-0 px-4 py-2 text-left border border-gray-100">${content}</blockquote></div>`
         }
       }
-      if (/^\d+\./.test(line)) {
-        const match = line.match(/^(\d+)\.\s*(.+)$/)
+      if (/^\d+\./.test(trimmedLine)) {
+        const match = trimmedLine.match(/^(\d+)\.\s*(.+)$/)
         if (match) {
           let content = match[2];
           content = content.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-[#111827]">$1</span>');
@@ -47,23 +54,27 @@ export default function Home() {
         }
       }
       // Regular paragraph
-      let content = line;
+      let content = line; // Maintain original whitespace for paragraphs if needed, but usually trimming is fine for display
       content = content.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-[#111827]">$1</span>');
       return `<p class="${isFirstPage ? "text-[13px] leading-relaxed text-[#4b5563] mb-0 text-justify" : "text-[13px] leading-snug mb-2.5 text-[#374151] text-justify"} font-normal tracking-wide">${content}</p>`
     }
 
     // Deep Template Styles (Match DeepReadingCard)
     // H1 - Match DeepReadingCard (Added mt-6 for more top spacing)
-    if (line.startsWith("# ")) {
-      return `<h1 class="text-[52px] leading-[1.15] font-extrabold text-[#8B3A1F] mb-8 mt-6 tracking-wider text-left">${line.slice(2)}</h1>`
+    if (/^#\s*/.test(trimmedLine) && !/^##\s*/.test(trimmedLine)) {
+      const content = trimmedLine.replace(/^#\s*/, '');
+      // Reduced font size from 42px to 34px and added leading-tight to ensure 3 lines max
+      return `<h1 class="text-[34px] leading-tight font-extrabold text-[#8B3A1F] mb-8 mt-6 tracking-wider text-left">${content}</h1>`
     }
     // H2 - Match DeepReadingCard
-    if (line.startsWith("## ")) {
-      return `<h2 class="text-[18px] font-bold text-[#8B3A1F] mb-3 mt-6 tracking-normal">${line.slice(3)}</h2>`
+    if (/^##\s*/.test(trimmedLine)) {
+      const content = trimmedLine.replace(/^##\s*/, '');
+      return `<h2 class="text-[18px] font-bold text-[#8B3A1F] mb-3 mt-6 tracking-normal">${content}</h2>`
     }
     // Quote - Match DeepReadingCard
-    if (line.startsWith("> ")) {
-      return `<blockquote class="${isFirstPage ? "text-[13px]" : "text-[13px]"} leading-[1.7] text-[#6D5D52] italic mb-5 pl-5 border-l-[3px] border-[#C8B8A8] py-0.5">${line.slice(2)}</blockquote>`
+    if (/^>\s*/.test(trimmedLine)) {
+      const content = trimmedLine.replace(/^>\s*/, '');
+      return `<blockquote class="${isFirstPage ? "text-[13px]" : "text-[13px]"} leading-[1.7] text-[#6D5D52] italic mb-5 pl-5 border-l-[3px] border-[#C8B8A8] py-0.5">${content}</blockquote>`
     }
     // Paragraph - Match DeepReadingCard
     let content = line;
@@ -101,7 +112,7 @@ export default function Home() {
 
     // Dynamic Height Calculation based on Template
     // Adjusted: Increased slightly to allow one more line at bottom (435px), while cover has reduced height due to top spacing check
-    const SAFE_HEIGHT_PAGE_1 = template === 'classic' ? 260 : 410; // Slightly increased from 400
+    const SAFE_HEIGHT_PAGE_1 = template === 'classic' ? 260 : 430; // Increased from 410 to 430 to allow more content on cover
     const SAFE_HEIGHT_PAGE_N = template === 'classic' ? 420 : 435; // Increased from 420 to allow more text
 
     // Pre-process: Split by paragraphs first
@@ -114,9 +125,13 @@ export default function Home() {
       const item = queue.shift(); // Take one block
       if (!item || !item.trim()) continue; // Skip empty lines
 
+      // Trim item for checking, but keep original for queue processing if needed (though usually we want trimmed for structure)
+      const trimmedItem = item.trim();
+
       // Special Rule: Force break BEFORE the first H2 (## ) if we are on the first page.
       // This ensures the cover page only contains Title + Quote + Intro.
-      if (isFirstPage && item.startsWith("## ") && currentPageItems.length > 0) {
+      // Updated to match both "## " and "##" and any whitespace
+      if (isFirstPage && /^##\s*/.test(trimmedItem) && currentPageItems.length > 0) {
         // Detect first H2 on page 1 -> Finalize Page 1 immediately.
         pages.push(currentPageItems.join('\n'));
         currentPageItems = [];
@@ -143,7 +158,8 @@ export default function Home() {
 
       // If it's a Heading or Blockquote (starts with # or >), we generally shouldn't split it inside.
       // Just push current page and move this item to next page.
-      if (item.startsWith('#') || item.startsWith('>')) {
+      // Use regex to check start of trimmed line
+      if (/^#/.test(trimmedItem) || /^>/.test(trimmedItem)) {
         if (currentPageItems.length > 0) {
           pages.push(currentPageItems.join('\n'));
           currentPageItems = [];
@@ -219,6 +235,69 @@ export default function Home() {
     }
 
     return pages;
+  }
+
+  // Auto-format content logic
+  const autoFormatContent = (text: string): string => {
+    if (!text.trim()) return text;
+
+    let lines = text.split('\n');
+    let formattedLines: string[] = [];
+    let hasTitle = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+      if (!line) {
+        formattedLines.push(''); // Keep empty lines for spacing
+        continue;
+      }
+
+      // 1. Force First Non-Empty Line as Title (if not already)
+      if (!hasTitle) {
+        if (/^#/.test(line)) {
+          // Already has #, ensure space
+          line = line.replace(/^#+\s*/, '# ');
+        } else {
+          // No #, add it
+          line = `# ${line}`;
+        }
+        hasTitle = true;
+        formattedLines.push(line);
+        continue;
+      }
+
+      // 2. Fix headings with no space (e.g., ##Title -> ## Title)
+      if (/^##+[^ ]/.test(line)) {
+         line = line.replace(/^(##+)/, '$1 ');
+      }
+
+      formattedLines.push(line);
+    }
+
+    return formattedLines.join('\n');
+  }
+
+  const handleCustomRender = () => {
+    if (!customContent.trim()) return
+    setLoading(true)
+    
+    // Simulate a small delay for better UX (rendering can be fast, but a small spinner looks nice)
+    setTimeout(() => {
+      try {
+        // Auto-format the content before rendering
+        const formatted = autoFormatContent(customContent);
+        // Optionally update the input box to show formatted content? 
+        // setCustomContent(formatted); // Let's keep input as is for now, or update it if user wants to see 'magic'
+        
+        const paginatedCards = calculatePages(formatted)
+        setCards(paginatedCards)
+      } catch (error) {
+        console.error("Render error:", error)
+        alert("排版失败，请检查输入内容")
+      } finally {
+        setLoading(false)
+      }
+    }, 300)
   }
 
   const handleGenerate = async () => {
@@ -330,6 +409,32 @@ export default function Home() {
 
               <div className="space-y-6">
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">选择模式</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setMode('ai')}
+                      className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${mode === 'ai'
+                        ? 'border-purple-500 bg-purple-50 text-purple-700 ring-1 ring-purple-500'
+                        : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                        }`}
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span className="text-sm font-medium">AI 智能生成</span>
+                    </button>
+                    <button
+                      onClick={() => setMode('custom')}
+                      className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${mode === 'custom'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 ring-1 ring-orange-500'
+                        : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                        }`}
+                    >
+                      <PenTool className="w-4 h-4" />
+                      <span className="text-sm font-medium">自定义长文排版</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">选择模版</label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
@@ -355,52 +460,79 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <div className="flex items-center gap-2">
-                      <UserCircle className="w-4 h-4" />
-                      目标人群 / 写作人设
-                    </div>
-                  </label>
-                  <Select value={persona} onValueChange={setPersona}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="选择目标人群" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="parenting">👶 育儿专家 (默认)</SelectItem>
-                      <SelectItem value="0-3_mom">🍼 0-3岁宝妈群体</SelectItem>
-                      <SelectItem value="3-8_mom">🎒 3-8岁宝妈群体</SelectItem>
-                      <SelectItem value="wellness">🧘‍♀️ 养生人群</SelectItem>
-                      <SelectItem value="sophisticated">💄 精致生活女孩</SelectItem>
-                      <SelectItem value="household">🏠 家庭日用百货</SelectItem>
-                      <SelectItem value="pet">🐾 养宠人群</SelectItem>
-                      <SelectItem value="growth">🧠 硬核女性成长 (安·兰德 x 毛选)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">输入标题</h3>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder={template === 'classic' ? "例如：毫无保留的爱" : "例如：如何深度思考？"}
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-                      className="flex-1"
-                    />
-                    <Button onClick={handleGenerate} disabled={loading || !title.trim()}>
-                      {loading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          生成中
-                        </>
-                      ) : (
-                        "生成"
-                      )}
-                    </Button>
+                {mode === 'ai' && (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <div className="flex items-center gap-2">
+                        <UserCircle className="w-4 h-4" />
+                        目标人群 / 写作人设
+                      </div>
+                    </label>
+                    <Select value={persona} onValueChange={setPersona}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="选择目标人群" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="parenting">👶 育儿专家 (默认)</SelectItem>
+                        <SelectItem value="0-3_mom">🍼 0-3岁宝妈群体</SelectItem>
+                        <SelectItem value="3-8_mom">🎒 3-8岁宝妈群体</SelectItem>
+                        <SelectItem value="wellness">🧘‍♀️ 养生人群</SelectItem>
+                        <SelectItem value="sophisticated">💄 精致生活女孩</SelectItem>
+                        <SelectItem value="household">🏠 家庭日用百货</SelectItem>
+                        <SelectItem value="pet">🐾 养宠人群</SelectItem>
+                        <SelectItem value="growth">🧠 硬核女性成长 (安·兰德 x 毛选)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
+                )}
+
+                {mode === 'ai' ? (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">输入标题</h3>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder={template === 'classic' ? "例如：毫无保留的爱" : "例如：如何深度思考？"}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
+                        className="flex-1"
+                      />
+                      <Button onClick={handleGenerate} disabled={loading || !title.trim()}>
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            生成中
+                          </>
+                        ) : (
+                          "生成"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">输入长文内容</h3>
+                    <div className="space-y-3">
+                      <Textarea
+                        placeholder={`# 你的大标题\n\n> 这里写一句金句引用\n\n这里开始写正文...\n\n## 小标题\n\n正文内容...`}
+                        value={customContent}
+                        onChange={(e) => setCustomContent(e.target.value)}
+                        rows={10}
+                        className="font-mono text-sm"
+                      />
+                      <Button onClick={handleCustomRender} disabled={loading || !customContent.trim()} className="w-full">
+                        {loading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            排版中...
+                          </>
+                        ) : (
+                          "开始排版"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -409,19 +541,6 @@ export default function Home() {
                 <div className="bg-white p-6 rounded-lg shadow-sm border">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold">编辑卡片内容</h2>
-                    <Button onClick={handleDownloadAll} disabled={downloadingIndex !== null} size="sm">
-                      {downloadingIndex !== null ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          下载中
-                        </>
-                      ) : (
-                        <>
-                          <Download className="mr-2 h-4 w-4" />
-                          下载全部
-                        </>
-                      )}
-                    </Button>
                   </div>
 
                   <div className="space-y-4">
@@ -449,7 +568,24 @@ export default function Home() {
           {/* Right: Preview */}
           <div>
             <div className="bg-white p-6 rounded-lg shadow-sm border sticky top-8">
-              <h2 className="text-xl font-semibold mb-4">预览 ({cards.length} 张卡片)</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">预览 ({cards.length} 张卡片)</h2>
+                {cards.length > 0 && (
+                  <Button onClick={handleDownloadAll} disabled={downloadingIndex !== null} size="sm">
+                    {downloadingIndex !== null ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        下载中
+                      </>
+                    ) : (
+                      <>
+                        <Download className="mr-2 h-4 w-4" />
+                        下载全部
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
               {cards.length === 0 ? (
                 <div className="flex items-center justify-center h-96 bg-gray-50 rounded-lg border-2 border-dashed">
                   <p className="text-gray-400">输入标题并生成后，多张卡片预览将显示在这里</p>

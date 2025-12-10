@@ -40,7 +40,7 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
         elements.push(
           <h1
             key={lineIndex}
-            className="text-[52px] leading-[1.15] font-extrabold text-[#8B3A1F] mb-8 mt-6 tracking-wider text-left"
+            className="text-[34px] leading-tight font-extrabold text-[#8B3A1F] mb-8 mt-6 tracking-wider text-left"
             style={{
               display: 'inline-block',
             }}
@@ -103,7 +103,7 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
       <div className={`w-16 h-1.5 bg-[#D7CCC8] ml-8 mb-4 ${isFirst ? "mt-8" : "mt-8"}`} />
 
       {/* Content */}
-      <div className="flex-1 px-8 flex flex-col pb-2">
+      <div className="flex-1 px-8 flex flex-col pb-4">
         {renderContent()}
       </div>
     </div>
