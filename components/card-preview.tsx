@@ -53,28 +53,21 @@ export function CardPreview({ content, index, total }: CardPreviewProps) {
     lines.forEach((line, lineIndex) => {
       line = line.trim()
 
-      // H1 Heading (Main Title)
-      if (line.startsWith("# ")) {
+      // Horizontal Rule
+      if (line === "---" || line === "***") {
         elements.push(
-          <h1
-            key={lineIndex}
-            className={`text-[24px] leading-snug font-bold text-[#111827] mb-3 tracking-tight ${
-              isFirst ? "text-center px-2" : "text-left"
-            }`}
-          >
-            {line.slice(2)}
-          </h1>,
+          <div key={lineIndex} className="w-full h-px bg-gray-200 my-4" />
         )
       }
-      // H2 Heading (Sub Title)
-      else if (line.startsWith("## ")) {
+      // H4 Heading
+      else if (line.startsWith("#### ")) {
         elements.push(
-          <h2
+          <h4
             key={lineIndex}
-            className="text-[20px] font-bold text-[#111827] mb-2 tracking-tight border-l-4 border-[#111827] pl-3"
+            className="text-[16px] font-bold text-[#111827] mb-2 mt-2 tracking-tight"
           >
-            {line.slice(3)}
-          </h2>,
+            {line.slice(5)}
+          </h4>,
         )
       }
       // H3 Heading
@@ -88,15 +81,28 @@ export function CardPreview({ content, index, total }: CardPreviewProps) {
           </h3>,
         )
       }
-      // H4 Heading
-      else if (line.startsWith("#### ")) {
+      // H2 Heading (Sub Title)
+      else if (line.startsWith("## ")) {
         elements.push(
-          <h4
+          <h2
             key={lineIndex}
-            className="text-[16px] font-bold text-[#111827] mb-2 mt-2 tracking-tight"
+            className="text-[20px] font-bold text-[#111827] mb-2 tracking-tight border-l-4 border-[#111827] pl-3"
           >
-            {line.slice(5)}
-          </h4>,
+            {line.slice(3)}
+          </h2>,
+        )
+      }
+      // H1 Heading (Main Title)
+      else if (line.startsWith("# ")) {
+        elements.push(
+          <h1
+            key={lineIndex}
+            className={`text-[24px] leading-snug font-bold text-[#111827] mb-3 tracking-tight ${
+              isFirst ? "text-center px-2" : "text-left"
+            }`}
+          >
+            {line.slice(2)}
+          </h1>,
         )
       }
       // Quote

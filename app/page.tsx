@@ -29,6 +29,9 @@ export default function Home() {
 
     if (template === 'classic') {
       // Classic Template Styles (Match CardPreview)
+      if (trimmedLine === "---" || trimmedLine === "***") {
+        return `<div class="w-full h-px bg-gray-200 my-4"></div>`
+      }
       if (/^####\s*/.test(trimmedLine)) {
         const content = trimmedLine.replace(/^####\s*/, '');
         return `<h4 class="text-[16px] font-bold text-[#111827] mb-2 mt-2 tracking-tight">${content}</h4>`
@@ -88,6 +91,10 @@ export default function Home() {
     if (/^##\s*/.test(trimmedLine)) {
       const content = trimmedLine.replace(/^##\s*/, '');
       return `<h2 class="text-[18px] font-bold text-[#8B3A1F] mb-3 mt-6 tracking-normal">${content}</h2>`
+    }
+    // Horizontal Rule
+    if (trimmedLine === "---" || trimmedLine === "***") {
+      return `<div class="w-full h-px bg-[#D7CCC8] my-6 opacity-60"></div>`
     }
     // Quote - Match DeepReadingCard
     if (/^>\s*/.test(trimmedLine)) {

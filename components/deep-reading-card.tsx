@@ -35,29 +35,21 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
     lines.forEach((line, lineIndex) => {
       line = line.trim()
 
-      // H1 Heading (Main Title) - only expected on first card
-      if (line.startsWith("# ")) {
+      // Horizontal Rule
+      if (line === "---" || line === "***") {
         elements.push(
-          <h1
-            key={lineIndex}
-            className="text-[34px] leading-tight font-extrabold text-[#8B3A1F] mb-8 mt-6 tracking-wider text-left"
-            style={{
-              display: 'inline-block',
-            }}
-          >
-            {line.slice(2)}
-          </h1>,
+          <div key={lineIndex} className="w-full h-px bg-[#D7CCC8] my-6 opacity-60" />
         )
       }
-      // H2 Heading (Sub Title)
-      else if (line.startsWith("## ")) {
+      // H4 Heading
+      else if (line.startsWith("#### ")) {
         elements.push(
-          <h2
+          <h4
             key={lineIndex}
-            className="text-[18px] font-bold text-[#8B3A1F] mb-3 mt-6 tracking-normal"
+            className="text-[14px] font-bold text-[#6B5344] mb-2 mt-2 tracking-normal"
           >
-            {line.slice(3)}
-          </h2>,
+            {line.slice(5)}
+          </h4>,
         )
       }
       // H3 Heading
@@ -71,15 +63,29 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
           </h3>,
         )
       }
-      // H4 Heading
-      else if (line.startsWith("#### ")) {
+      // H2 Heading (Sub Title)
+      else if (line.startsWith("## ")) {
         elements.push(
-          <h4
+          <h2
             key={lineIndex}
-            className="text-[14px] font-bold text-[#6B5344] mb-2 mt-2 tracking-normal"
+            className="text-[18px] font-bold text-[#8B3A1F] mb-3 mt-6 tracking-normal"
           >
-            {line.slice(5)}
-          </h4>,
+            {line.slice(3)}
+          </h2>,
+        )
+      }
+      // H1 Heading (Main Title) - only expected on first card
+      else if (line.startsWith("# ")) {
+        elements.push(
+          <h1
+            key={lineIndex}
+            className="text-[34px] leading-tight font-extrabold text-[#8B3A1F] mb-8 mt-6 tracking-wider text-left"
+            style={{
+              display: 'inline-block',
+            }}
+          >
+            {line.slice(2)}
+          </h1>,
         )
       }
       // Quote
