@@ -60,6 +60,28 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
           </h2>,
         )
       }
+      // H3 Heading
+      else if (line.startsWith("### ")) {
+        elements.push(
+          <h3
+            key={lineIndex}
+            className="text-[16px] font-bold text-[#8B3A1F] mb-2 mt-4 tracking-normal"
+          >
+            {line.slice(4)}
+          </h3>,
+        )
+      }
+      // H4 Heading
+      else if (line.startsWith("#### ")) {
+        elements.push(
+          <h4
+            key={lineIndex}
+            className="text-[14px] font-bold text-[#6B5344] mb-2 mt-2 tracking-normal"
+          >
+            {line.slice(5)}
+          </h4>,
+        )
+      }
       // Quote
       else if (line.startsWith("> ")) {
         elements.push(

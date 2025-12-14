@@ -77,6 +77,28 @@ export function CardPreview({ content, index, total }: CardPreviewProps) {
           </h2>,
         )
       }
+      // H3 Heading
+      else if (line.startsWith("### ")) {
+        elements.push(
+          <h3
+            key={lineIndex}
+            className="text-[18px] font-bold text-[#111827] mb-2 mt-3 tracking-tight"
+          >
+            {line.slice(4)}
+          </h3>,
+        )
+      }
+      // H4 Heading
+      else if (line.startsWith("#### ")) {
+        elements.push(
+          <h4
+            key={lineIndex}
+            className="text-[16px] font-bold text-[#111827] mb-2 mt-2 tracking-tight"
+          >
+            {line.slice(5)}
+          </h4>,
+        )
+      }
       // Quote
       else if (line.startsWith("> ")) {
         elements.push(

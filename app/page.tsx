@@ -29,11 +29,19 @@ export default function Home() {
 
     if (template === 'classic') {
       // Classic Template Styles (Match CardPreview)
+      if (/^####\s*/.test(trimmedLine)) {
+        const content = trimmedLine.replace(/^####\s*/, '');
+        return `<h4 class="text-[16px] font-bold text-[#111827] mb-2 mt-2 tracking-tight">${content}</h4>`
+      }
+      if (/^###\s*/.test(trimmedLine)) {
+        const content = trimmedLine.replace(/^###\s*/, '');
+        return `<h3 class="text-[18px] font-bold text-[#111827] mb-2 mt-3 tracking-tight">${content}</h3>`
+      }
       if (/^##\s*/.test(trimmedLine)) {
         const content = trimmedLine.replace(/^##\s*/, '');
         return `<h2 class="text-[20px] font-bold text-[#111827] mb-2 tracking-tight border-l-4 border-[#111827] pl-3">${content}</h2>`
       }
-      if (/^#\s*/.test(trimmedLine) && !/^##\s*/.test(trimmedLine)) {
+      if (/^#\s*/.test(trimmedLine) && !/^##/.test(trimmedLine)) {
         const content = trimmedLine.replace(/^#\s*/, '');
         return `<h1 class="text-[24px] leading-snug font-bold text-[#111827] mb-3 tracking-tight ${isFirstPage ? "text-center px-2" : "text-left"}">${content}</h1>`
       }
@@ -61,10 +69,20 @@ export default function Home() {
 
     // Deep Template Styles (Match DeepReadingCard)
     // H1 - Match DeepReadingCard (Added mt-6 for more top spacing)
-    if (/^#\s*/.test(trimmedLine) && !/^##\s*/.test(trimmedLine)) {
+    if (/^#\s*/.test(trimmedLine) && !/^##/.test(trimmedLine)) {
       const content = trimmedLine.replace(/^#\s*/, '');
       // Reduced font size from 42px to 34px and added leading-tight to ensure 3 lines max
       return `<h1 class="text-[34px] leading-tight font-extrabold text-[#8B3A1F] mb-8 mt-6 tracking-wider text-left">${content}</h1>`
+    }
+    // H4 - Match DeepReadingCard
+    if (/^####\s*/.test(trimmedLine)) {
+      const content = trimmedLine.replace(/^####\s*/, '');
+      return `<h4 class="text-[14px] font-bold text-[#6B5344] mb-2 mt-2 tracking-normal">${content}</h4>`
+    }
+    // H3 - Match DeepReadingCard
+    if (/^###\s*/.test(trimmedLine)) {
+      const content = trimmedLine.replace(/^###\s*/, '');
+      return `<h3 class="text-[16px] font-bold text-[#8B3A1F] mb-2 mt-4 tracking-normal">${content}</h3>`
     }
     // H2 - Match DeepReadingCard
     if (/^##\s*/.test(trimmedLine)) {
