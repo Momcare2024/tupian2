@@ -35,27 +35,28 @@ export default function Home() {
         return `<div class="w-full h-px bg-gray-300 my-6"></div>`
       }
       if (/^####\s*/.test(trimmedLine)) {
-        const content = trimmedLine.replace(/^####\s*/, '');
+        let content = trimmedLine.replace(/^####\s*/, '');
+        content = content.replace(/\*\*/g, ''); // Clean stray **
         return `<h4 class="text-[15px] font-bold text-[#374151] mb-4 mt-6 tracking-wide font-serif">${content}</h4>`
       }
       if (/^###\s*/.test(trimmedLine)) {
-        const content = trimmedLine.replace(/^###\s*/, '');
+        let content = trimmedLine.replace(/^###\s*/, '');
+        content = content.replace(/\*\*/g, ''); // Clean stray **
         return `<h3 class="text-[18px] font-bold text-[#111827] mb-4 mt-8 tracking-wide font-serif">${content}</h3>`
       }
       if (/^##\s*/.test(trimmedLine)) {
-        const content = trimmedLine.replace(/^##\s*/, '');
+        let content = trimmedLine.replace(/^##\s*/, '');
+        content = content.replace(/\*\*/g, ''); // Clean stray **
         return `<h2 class="text-[20px] font-bold text-[#111827] mb-6 mt-8 tracking-wide font-serif">${content}</h2>`
       }
       if (/^#\s*/.test(trimmedLine) && !/^##/.test(trimmedLine)) {
-        const content = trimmedLine.replace(/^#\s*/, '');
-        let html = `<h1 class="font-serif text-[30px] leading-[1.2] font-bold text-[#111827] mb-6 tracking-wide ${isFirstPage ? "mt-0 text-left" : "mt-8 text-left"}">${content}</h1>`;
-        if (isFirstPage) {
-          html += `<div class="w-full h-px bg-gray-300 mb-6"></div>`;
-        }
-        return html;
+        let content = trimmedLine.replace(/^#\s*/, '');
+        content = content.replace(/\*\*/g, ''); // Clean stray **
+        return `<h1 class="font-serif text-[30px] leading-[1.2] font-bold text-[#111827] mb-6 tracking-wide ${isFirstPage ? "mt-0 text-left" : "mt-8 text-left"}">${content}</h1>`;
       }
       if (/^>\s*/.test(trimmedLine)) {
-        const content = trimmedLine.replace(/^>\s*/, '');
+        let content = trimmedLine.replace(/^>\s*/, '');
+        content = content.replace(/\*\*/g, ''); // Clean stray **
         return `<blockquote class="text-[14px] leading-[1.8] text-[#4B5563] italic mb-4 pl-5 border-l-[3px] border-[#9CA3AF] py-1 font-serif">${content}</blockquote>`
       }
       if (/^\d+\./.test(trimmedLine)) {
@@ -63,13 +64,15 @@ export default function Home() {
         if (match) {
           let content = match[2];
           content = content.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-[#000000]">$1</span>');
-          return `<div class="flex gap-3 mb-2 items-start text-justify group font-serif"><span class="font-sans text-[12px] font-bold text-white shrink-0 leading-5 mt-1 bg-[#111827] w-5 h-5 flex items-center justify-center rounded-full text-[10px] shadow-sm">${match[1]}</span><p class="text-[14px] leading-[1.8] text-[#1F2937] font-normal tracking-wide pt-0">${content}</p></div>`
+          content = content.replace(/\*\*/g, ''); // Clean stray **
+          return `<div class="flex gap-3 mb-2 items-start text-justify group font-serif"><span class="font-sans text-[12px] font-bold text-white shrink-0 leading-5 mt-1 bg-[#111827] w-5 h-5 flex items-center justify-center rounded-full text-[10px] shadow-sm">${match[1]}</span><p class="text-[13px] leading-[1.8] text-[#1F2937] font-normal tracking-wide pt-0">${content}</p></div>`
         }
       }
       // Regular paragraph
       let content = line; 
       content = content.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-[#000000]">$1</span>');
-      return `<p class="text-[14px] leading-[1.8] text-[#1F2937] mb-3 text-justify tracking-wide font-normal font-serif">${content}</p>`
+      content = content.replace(/\*\*/g, ''); // Clean stray **
+      return `<p class="text-[13px] leading-[1.8] text-[#1F2937] mb-3 text-justify tracking-wide font-normal font-serif">${content}</p>`
     }
 
     // Deep Template Styles (Match DeepReadingCard)
@@ -81,31 +84,36 @@ export default function Home() {
     }
     // H4 - Match DeepReadingCard
     if (/^####\s*/.test(trimmedLine)) {
-      const content = trimmedLine.replace(/^####\s*/, '');
+      let content = trimmedLine.replace(/^####\s*/, '');
+      content = content.replace(/\*\*/g, ''); // Clean stray **
       return `<h4 class="text-[14px] font-bold text-[#6B5344] mb-2 mt-2 tracking-normal">${content}</h4>`
     }
     // H3 - Match DeepReadingCard
     if (/^###\s*/.test(trimmedLine)) {
-      const content = trimmedLine.replace(/^###\s*/, '');
+      let content = trimmedLine.replace(/^###\s*/, '');
+      content = content.replace(/\*\*/g, ''); // Clean stray **
       return `<h3 class="text-[16px] font-bold text-[#8B3A1F] mb-2 mt-4 tracking-normal">${content}</h3>`
     }
     // H2 - Match DeepReadingCard
     if (/^##\s*/.test(trimmedLine)) {
-      const content = trimmedLine.replace(/^##\s*/, '');
+      let content = trimmedLine.replace(/^##\s*/, '');
+      content = content.replace(/\*\*/g, ''); // Clean stray **
       return `<h2 class="text-[18px] font-bold text-[#8B3A1F] mb-3 mt-6 tracking-normal">${content}</h2>`
     }
-    // Horizontal Rule
+    // Horizontal Rule - Hidden in Deep Template
     if (trimmedLine === "---" || trimmedLine === "***") {
-      return `<div class="w-full h-px bg-[#D7CCC8] my-6 opacity-60"></div>`
+      return `` // Render nothing
     }
     // Quote - Match DeepReadingCard
     if (/^>\s*/.test(trimmedLine)) {
-      const content = trimmedLine.replace(/^>\s*/, '');
+      let content = trimmedLine.replace(/^>\s*/, '');
+      content = content.replace(/\*\*/g, ''); // Clean stray **
       return `<blockquote class="${isFirstPage ? "text-[13px]" : "text-[13px]"} leading-[1.7] text-[#6D5D52] italic mb-5 pl-5 border-l-[3px] border-[#C8B8A8] py-0.5">${content}</blockquote>`
     }
     // Paragraph - Match DeepReadingCard
     let content = line;
     content = content.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-[#5D4037]">$1</span>');
+    content = content.replace(/\*\*/g, ''); // Clean stray **
     return `<p class="${isFirstPage ? "text-[13px]" : "text-[13px]"} leading-[1.75] text-[#6B5344] mb-2 text-justify tracking-normal font-normal">${content}</p>`
   }
 
@@ -139,8 +147,8 @@ export default function Home() {
 
     // Dynamic Height Calculation based on Template
     // Adjusted: Increased slightly to allow one more line at bottom (435px), while cover has reduced height due to top spacing check
-    const SAFE_HEIGHT_PAGE_1 = template === 'classic' ? 455 : 430; // Classic Cover: Reduced font size allows for more content height relative to container
-    const SAFE_HEIGHT_PAGE_N = template === 'classic' ? 465 : 435; // Classic Page N: Extreme optimization, close to bottom edge
+    const SAFE_HEIGHT_PAGE_1 = template === 'classic' ? 430 : 440; // Classic: 430 (13px font), Deep: 440
+    const SAFE_HEIGHT_PAGE_N = template === 'classic' ? 465 : 460; // Classic: 465 (13px font), Deep: 460
 
     // Pre-process: Split by paragraphs first
     const rawParagraphs = fullText.split('\n');
@@ -415,8 +423,8 @@ export default function Home() {
         className="fixed top-0 left-0 pointer-events-none opacity-0 z-[-1] flex flex-col"
         style={{
           width: '375px', // Same as card width
-          paddingLeft: '24px', // px-6
-          paddingRight: '24px', // px-6
+          paddingLeft: '24px', // Both templates now use px-6 (24px)
+          paddingRight: '24px', // Both templates now use px-6 (24px)
         }}
       >
         {/* Content will be injected here for measurement */}

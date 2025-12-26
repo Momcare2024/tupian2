@@ -16,6 +16,7 @@ export function CardPreview({ content, index, total }: CardPreviewProps) {
   
   // Helper to parse inline markdown (specifically bold)
   const parseInline = (text: string) => {
+    // First, handle complete bold pairs
     const parts = text.split(/(\*\*[^*]+\*\*)/g)
     return parts.map((part, index) => {
       if (part.startsWith("**") && part.endsWith("**")) {
@@ -25,7 +26,8 @@ export function CardPreview({ content, index, total }: CardPreviewProps) {
           </span>
         )
       }
-      return part
+      // Clean up any stray ** that weren't part of a pair
+      return part.replace(/\*\*/g, "")
     })
   }
 
@@ -113,7 +115,7 @@ export function CardPreview({ content, index, total }: CardPreviewProps) {
               <span className="font-sans text-[12px] font-bold text-white shrink-0 leading-5 mt-1 bg-[#111827] w-5 h-5 flex items-center justify-center rounded-full text-[10px] shadow-sm">
                 {match[1]}
               </span>
-              <p className="text-[14px] leading-[1.8] text-[#1F2937] font-normal tracking-wide pt-0">
+              <p className="text-[13px] leading-[1.8] text-[#1F2937] font-normal tracking-wide pt-0">
                 {parseInline(match[2])}
               </p>
             </div>,
@@ -125,7 +127,7 @@ export function CardPreview({ content, index, total }: CardPreviewProps) {
         elements.push(
           <p
             key={lineIndex}
-            className="text-[14px] leading-[1.8] text-[#1F2937] mb-3 text-justify tracking-wide font-normal font-serif"
+            className="text-[13px] leading-[1.8] text-[#1F2937] mb-3 text-justify tracking-wide font-normal font-serif"
           >
             {parseInline(line)}
           </p>,

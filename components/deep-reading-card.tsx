@@ -15,6 +15,7 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
 
   // Helper to parse inline markdown (specifically bold)
   const parseInline = (text: string) => {
+    // First, handle complete bold pairs
     const parts = text.split(/(\*\*[^*]+\*\*)/g)
     return parts.map((part, index) => {
       if (part.startsWith("**") && part.endsWith("**")) {
@@ -24,7 +25,8 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
           </span>
         )
       }
-      return part
+      // Clean up any stray ** that weren't part of a pair
+      return part.replace(/\*\*/g, "")
     })
   }
 
@@ -35,11 +37,12 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
     lines.forEach((line, lineIndex) => {
       line = line.trim()
 
-      // Horizontal Rule
+      // Horizontal Rule - Hidden in Deep Template for cleaner look
       if (line === "---" || line === "***") {
-        elements.push(
-          <div key={lineIndex} className="w-full h-px bg-[#D7CCC8] my-6 opacity-60" />
-        )
+        // elements.push(
+        //   <div key={lineIndex} className="w-full h-px bg-[#D7CCC8] my-6 opacity-60" />
+        // )
+        return // Skip rendering
       }
       // H4 Heading
       else if (line.startsWith("#### ")) {
@@ -127,11 +130,8 @@ export function DeepReadingCard({ content, index, total }: DeepReadingCardProps)
         backgroundColor: "#FAF8F3", // 极浅暖白色，更接近参考图
       }}
     >
-      {/* Top Decorative Line */}
-      <div className={`w-16 h-1.5 bg-[#D7CCC8] ml-8 mb-4 ${isFirst ? "mt-8" : "mt-8"}`} />
-
       {/* Content */}
-      <div className="flex-1 px-8 flex flex-col pb-4">
+      <div className={`flex-1 px-6 flex flex-col pb-2 ${isFirst ? "pt-12" : "pt-10"}`}>
         {renderContent()}
       </div>
     </div>
